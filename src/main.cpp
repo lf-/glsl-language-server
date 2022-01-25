@@ -16,6 +16,7 @@
 #include <optional>
 #include <regex>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "messagebuffer.hpp"
@@ -44,8 +45,13 @@ std::string make_response(const json& response)
     return header + content.dump(4);
 }
 
-EShLanguage find_language(const std::string& name)
+EShLanguage find_language(const std::string& nameIn)
 {
+    auto name = std::string_view{nameIn};
+    if (name.rfind(".glsl") != name.npos) {
+        name = name.substr(0, name.size() - 5);
+    }
+
     auto ext = fs::path(name).extension();
     if (ext == ".vert" || ext == ".vs")
         return EShLangVertex;
